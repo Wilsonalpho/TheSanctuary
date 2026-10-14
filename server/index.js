@@ -4,7 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { loadLoans, saveLoans, generateLoanId } from './db.js';
+import { loadLoans, saveLoans, generateLoanId, loadBooks, saveBooks, generateBookId } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -500,21 +500,175 @@ app.get('/api/analytics', (req, res) => {
   });
 });
 
-// 11. Quick catalog of coffee shop books for fast selection or auto-suggest
+// 11. Book Database Management Routes (Shopkeeper maintenance & Borrower shelf)
+app.get('/api/books', (req, res) => {
+  const books = loadBooks();
+  const { search, category } = req.query;
+
+  let filtered = [...books];
+
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(b =>
+      b.title.toLowerCase().includes(q) ||
+      b.author.toLowerCase().includes(q) ||
+      b.category.toLowerCase().includes(q)
+    );
+  }
+
+  if (category && category !== 'all') {
+    filtered = filtered.filter(b => b.category.toLowerCase() === category.toLowerCase());
+  }
+
+  res.json(filtered);
+});
+
+app.get('/api/books/:id', (req, res) => {
+  const books = loadBooks();
+  const book = books.find(b => b.id === req.params.id);
+  if (!book) return res.status(404).json({ error: 'Book not found' });
+  res.json(book);
+});
+
+app.post('/api/books', upload.single('image'), (req, res) => {
+  try {
+    const books = loadBooks();
+    const { title, author, category, description, available } = req.body;
+
+    if (!title || !title.trim() || !author || !author.trim() || !category || !category.trim()) {
+      return res.status(400).json({ error: 'Book title, author, and category are required' });
+    }
+
+    let imageUrl = '';
+    if (req.file) {
+      imageUrl = `/uploads/${req.file.filename}`;
+    } else if (req.body.imageBase64) {
+      try {
+        const matches = req.body.imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        if (matches && matches.length === 3) {
+          const ext = matches[1].includes('png') ? '.png' : '.jpg';
+          const filename = `book-cover-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
+          const filePath = path.join(uploadsDir, filename);
+          fs.writeFileSync(filePath, Buffer.from(matches[2], 'base64'));
+          imageUrl = `/uploads/${filename}`;
+        }
+      } catch (err) {
+        console.error('Failed to parse book image base64:', err);
+      }
+    } else if (req.body.image) {
+      imageUrl = req.body.image;
+    }
+
+    if (!imageUrl) {
+      imageUrl = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80';
+    }
+
+    const newBook = {
+      id: generateBookId(),
+      title: title.trim(),
+      author: author.trim(),
+      category: category.trim(),
+      image: imageUrl,
+      available: available !== undefined ? (available === true || available === 'true') : true,
+      description: description ? description.trim() : '',
+      createdAt: new Date().toISOString()
+    };
+
+    books.unshift(newBook);
+    saveBooks(books);
+
+    broadcastSSE('book_added', {
+      type: 'book_added',
+      book: newBook,
+      message: `"${newBook.title}" added to the shop catalog!`,
+      timestamp: new Date().toISOString()
+    });
+
+    res.status(201).json(newBook);
+  } catch (err) {
+    console.error('Error creating book:', err);
+    res.status(500).json({ error: 'Failed to add book to catalog' });
+  }
+});
+
+app.put('/api/books/:id', upload.single('image'), (req, res) => {
+  try {
+    const books = loadBooks();
+    const index = books.findIndex(b => b.id === req.params.id);
+    if (index === -1) {
+      return res.status(404).json({ error: 'Book not found' });
+    }
+
+    const { title, author, category, description, available } = req.body;
+
+    if (title) books[index].title = title.trim();
+    if (author) books[index].author = author.trim();
+    if (category) books[index].category = category.trim();
+    if (description !== undefined) books[index].description = description.trim();
+    if (available !== undefined) {
+      books[index].available = (available === true || available === 'true');
+    }
+
+    if (req.file) {
+      books[index].image = `/uploads/${req.file.filename}`;
+    } else if (req.body.imageBase64) {
+      try {
+        const matches = req.body.imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        if (matches && matches.length === 3) {
+          const ext = matches[1].includes('png') ? '.png' : '.jpg';
+          const filename = `book-cover-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
+          const filePath = path.join(uploadsDir, filename);
+          fs.writeFileSync(filePath, Buffer.from(matches[2], 'base64'));
+          books[index].image = `/uploads/${filename}`;
+        }
+      } catch (err) {
+        console.error('Failed to parse image base64:', err);
+      }
+    } else if (req.body.image) {
+      books[index].image = req.body.image;
+    }
+
+    books[index].updatedAt = new Date().toISOString();
+    saveBooks(books);
+
+    broadcastSSE('book_updated', {
+      type: 'book_updated',
+      book: books[index],
+      message: `"${books[index].title}" updated.`,
+      timestamp: new Date().toISOString()
+    });
+
+    res.json(books[index]);
+  } catch (err) {
+    console.error('Error updating book:', err);
+    res.status(500).json({ error: 'Failed to update book' });
+  }
+});
+
+app.delete('/api/books/:id', (req, res) => {
+  const books = loadBooks();
+  const index = books.findIndex(b => b.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+
+  const removed = books.splice(index, 1)[0];
+  saveBooks(books);
+
+  broadcastSSE('book_deleted', {
+    type: 'book_deleted',
+    bookId: req.params.id,
+    message: `"${removed.title}" removed from catalog.`,
+    timestamp: new Date().toISOString()
+  });
+
+  res.json({ success: true, removed });
+});
+
+// Quick catalog alias for borrower form
 app.get('/api/catalog', (req, res) => {
-  const catalog = [
-    { id: 1, title: "Before the Coffee Gets Cold", author: "Toshikazu Kawaguchi", category: "Magical Realism", available: true },
-    { id: 2, title: "Days at the Morisaki Bookshop", author: "Satoshi Yagisawa", category: "Contemporary", available: true },
-    { id: 3, title: "The Midnight Library", author: "Matt Haig", category: "Fiction", available: false },
-    { id: 4, title: "Norwegian Wood", author: "Haruki Murakami", category: "Literary Fiction", available: false },
-    { id: 5, title: "Klara and the Sun", author: "Kazuo Ishiguro", category: "Speculative Fiction", available: false },
-    { id: 6, title: "A Gentleman in Moscow", author: "Amor Towles", category: "Historical Fiction", available: true },
-    { id: 7, title: "What You Are Looking For Is in the Library", author: "Michiko Aoyama", category: "Japanese Fiction", available: true },
-    { id: 8, title: "The Little Paris Bookshop", author: "Nina George", category: "Romance / Fiction", available: true },
-    { id: 9, title: "Sweet Bean Paste", author: "Durian Sukegawa", category: "Fiction", available: true },
-    { id: 10, title: "Convenience Store Woman", author: "Sayaka Murata", category: "Satire", available: true },
-  ];
-  res.json(catalog);
+  const books = loadBooks();
+  res.json(books);
 });
 
 // 12. Serve frontend static assets if dist exists

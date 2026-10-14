@@ -70,10 +70,16 @@ export interface AnalyticsData {
   totalRecorded: number;
 }
 
-export interface CatalogBook {
-  id: number;
+export interface BookItem {
+  id: string;
   title: string;
   author: string;
   category: string;
+  image: string;
   available: boolean;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export type CatalogBook = BookItem;

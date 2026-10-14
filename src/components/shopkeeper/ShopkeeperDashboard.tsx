@@ -4,6 +4,7 @@ import { StatsCards } from './StatsCards';
 import { LoanManagementTable } from './LoanManagementTable';
 import { ApprovalQueue } from './ApprovalQueue';
 import { AnalyticsView } from './AnalyticsView';
+import { BookCatalogManager } from './BookCatalogManager';
 import {
   LayoutDashboard,
   Clock,
@@ -12,14 +13,15 @@ import {
   RotateCcw,
   QrCode,
   Radio,
-  Library
+  Library,
+  BookOpen
 } from 'lucide-react';
 import { CounterQRModal } from '../common/CounterQRModal';
 
 export const ShopkeeperDashboard: React.FC = () => {
   const { loans, stats, refreshData } = useSanctuary();
 
-  const [activeSubTab, setActiveSubTab] = useState<'loans' | 'approvals' | 'analytics'>('loans');
+  const [activeSubTab, setActiveSubTab] = useState<'loans' | 'approvals' | 'books' | 'analytics'>('loans');
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showQRModal, setShowQRModal] = useState<boolean>(false);
@@ -178,6 +180,18 @@ export const ShopkeeperDashboard: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setActiveSubTab('books')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+            activeSubTab === 'books'
+              ? 'bg-zinc-900 text-white'
+              : 'text-zinc-600 hover:bg-zinc-100'
+          }`}
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>Book Database</span>
+        </button>
+
+        <button
           onClick={() => setActiveSubTab('analytics')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
             activeSubTab === 'analytics'
@@ -210,6 +224,10 @@ export const ShopkeeperDashboard: React.FC = () => {
 
       {activeSubTab === 'approvals' && (
         <ApprovalQueue />
+      )}
+
+      {activeSubTab === 'books' && (
+        <BookCatalogManager />
       )}
 
       {activeSubTab === 'analytics' && (

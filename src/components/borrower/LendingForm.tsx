@@ -187,17 +187,24 @@ export const LendingForm: React.FC<LendingFormProps> = ({ onSuccess }) => {
                 Close
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto">
               {catalog.map((book) => (
                 <button
                   key={book.id}
                   type="button"
                   onClick={() => handlePickFromCatalog(book.title, book.author)}
-                  className="text-left p-2 rounded-lg bg-white hover:bg-zinc-100 border border-zinc-200/60 transition-colors flex items-start gap-1.5"
+                  className="text-left p-2 rounded-lg bg-white hover:bg-zinc-100 border border-zinc-200/60 transition-colors flex items-center gap-2"
                 >
-                  <div className="text-[11px] leading-tight truncate">
+                  {book.image && (
+                    <img
+                      src={book.image}
+                      alt={book.title}
+                      className="w-7 h-9 rounded object-cover border border-zinc-200 shrink-0"
+                    />
+                  )}
+                  <div className="text-[11px] leading-tight truncate flex-1 min-w-0">
                     <p className="font-medium text-zinc-900 truncate">{book.title}</p>
-                    <p className="text-[10px] text-zinc-400">{book.author}</p>
+                    <p className="text-[10px] text-zinc-400 truncate">{book.author}</p>
                   </div>
                 </button>
               ))}

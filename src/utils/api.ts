@@ -1,4 +1,4 @@
-import { Loan, LoanStats, SystemNotification, AnalyticsData, CatalogBook } from '../types/loan';
+import { Loan, LoanStats, SystemNotification, AnalyticsData, CatalogBook, BookItem } from '../types/loan';
 
 const API_BASE = '/api';
 
@@ -105,9 +105,58 @@ export const api = {
     return res.json();
   },
 
-  // Coffee shop book catalog
+  // Books Database Management
+  async getBooks(params?: { search?: string; category?: string }): Promise<BookItem[]> {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.category) query.append('category', params.category);
+
+    const res = await fetch(`${API_BASE}/books?${query.toString()}`);
+    if (!res.ok) throw new Error('Failed to fetch books');
+    return res.json();
+  },
+
+  async getBookById(id: string): Promise<BookItem> {
+    const res = await fetch(`${API_BASE}/books/${id}`);
+    if (!res.ok) throw new Error('Book not found');
+    return res.json();
+  },
+
+  async createBook(formData: FormData): Promise<BookItem> {
+    const res = await fetch(`${API_BASE}/books`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to add book');
+    }
+    return res.json();
+  },
+
+  async updateBook(id: string, formData: FormData): Promise<BookItem> {
+    const res = await fetch(`${API_BASE}/books/${id}`, {
+      method: 'PUT',
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to update book');
+    }
+    return res.json();
+  },
+
+  async deleteBook(id: string): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_BASE}/books/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete book');
+    return res.json();
+  },
+
+  // Coffee shop book catalog (alias for borrower quick selection)
   async getCatalog(): Promise<CatalogBook[]> {
-    const res = await fetch(`${API_BASE}/catalog`);
+    const res = await fetch(`${API_BASE}/books`);
     if (!res.ok) return [];
     return res.json();
   }

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Loan, LoanStats, SystemNotification } from '../types/loan';
+import { Loan, LoanStats, SystemNotification, BookItem } from '../types/loan';
 import { api } from '../utils/api';
 import { soundEffects, requestNotificationPermission, showBrowserNotification } from '../utils/audioAlert';
 
@@ -12,6 +12,7 @@ interface ToastItem {
 
 interface SanctuaryContextType {
   loans: Loan[];
+  books: BookItem[];
   stats: LoanStats | null;
   notifications: SystemNotification[];
   loading: boolean;
@@ -21,6 +22,7 @@ interface SanctuaryContextType {
   activeTab: 'borrow' | 'my-loans' | 'shopkeeper';
   setActiveTab: (tab: 'borrow' | 'my-loans' | 'shopkeeper') => void;
   refreshData: () => Promise<void>;
+  refreshBooks: () => Promise<void>;
   toasts: ToastItem[];
   removeToast: (id: string) => void;
   addToast: (toast: Omit<ToastItem, 'id'>) => void;
@@ -33,6 +35,7 @@ const SanctuaryContext = createContext<SanctuaryContextType | undefined>(undefin
 
 export const SanctuaryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [books, setBooks] = useState<BookItem[]>([]);
   const [stats, setStats] = useState<LoanStats | null>(null);
   const [notifications, setNotifications] = useState<SystemNotification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -75,16 +78,27 @@ export const SanctuaryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return granted;
   };
 
+  const refreshBooks = useCallback(async () => {
+    try {
+      const fetchedBooks = await api.getBooks();
+      setBooks(fetchedBooks);
+    } catch (err) {
+      console.error('Failed to load books:', err);
+    }
+  }, []);
+
   const refreshData = useCallback(async () => {
     try {
-      const [fetchedLoans, fetchedStats, fetchedNotifs] = await Promise.all([
+      const [fetchedLoans, fetchedStats, fetchedNotifs, fetchedBooks] = await Promise.all([
         api.getLoans(),
         api.getStats(),
         api.getNotifications(),
+        api.getBooks(),
       ]);
       setLoans(fetchedLoans);
       setStats(fetchedStats);
       setNotifications(fetchedNotifs.alerts);
+      setBooks(fetchedBooks);
     } catch (err) {
       console.error('Failed to load Sanctuary data:', err);
     } finally {
@@ -194,12 +208,44 @@ export const SanctuaryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       });
 
+      // Book Catalog live events
+      eventSource.addEventListener('book_added', (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          addToast({
+            type: 'info',
+            title: 'Catalog Updated',
+            message: data.message,
+          });
+          refreshBooks();
+        } catch (e) {
+          console.error('SSE parse error:', e);
+        }
+      });
+
+      eventSource.addEventListener('book_updated', (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          addToast({
+            type: 'info',
+            title: 'Book Updated',
+            message: data.message,
+          });
+          refreshBooks();
+        } catch (e) {
+          console.error('SSE parse error:', e);
+        }
+      });
+
+      eventSource.addEventListener('book_deleted', () => {
+        refreshBooks();
+      });
+
       eventSource.onerror = () => {
         setSseConnected(false);
         if (eventSource) {
           eventSource.close();
         }
-        // Attempt reconnection in 5s
         reconnectTimeout = setTimeout(connectSSE, 5000);
       };
     };
@@ -210,12 +256,13 @@ export const SanctuaryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (eventSource) eventSource.close();
       clearTimeout(reconnectTimeout);
     };
-  }, [addToast, refreshData]);
+  }, [addToast, refreshData, refreshBooks]);
 
   return (
     <SanctuaryContext.Provider
       value={{
         loans,
+        books,
         stats,
         notifications,
         loading,
@@ -225,6 +272,7 @@ export const SanctuaryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         activeTab,
         setActiveTab,
         refreshData,
+        refreshBooks,
         toasts,
         removeToast,
         addToast,
