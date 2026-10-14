@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #fbf9f5;
+    color: #1c130e;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f5eee6;
+}
+::-webkit-scrollbar-thumb {
+  background: #debfa4;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c79870;
+}
+
+/* Print styling for Counter QR standee */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-standee, #printable-standee * {
+    visibility: visible;
+  }
+  #printable-standee {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+  }
+}
