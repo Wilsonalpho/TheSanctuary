@@ -4,7 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { loadLoans, saveLoans, generateLoanId, loadBooks, saveBooks, generateBookId } from './db.js';
+import { loadLoans, saveLoans, generateLoanId, loadBooks, saveBooks, generateBookId, UPLOADS_DIR } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,7 +18,7 @@ app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Static uploads directory
-const uploadsDir = path.join(__dirname, 'uploads');
+const uploadsDir = UPLOADS_DIR;
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -683,7 +683,11 @@ if (fs.existsSync(distDir)) {
   });
 }
 
-// Start listening
-app.listen(PORT, () => {
-  console.log(`☕ The Sanctuary server listening on http://localhost:${PORT}`);
-});
+// Start listening (only when not running inside a serverless lambda)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`☕ The Sanctuary server listening on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

@@ -5,9 +5,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATA_DIR = path.join(__dirname, 'data');
-const DB_FILE = path.join(DATA_DIR, 'loans.json');
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
+export const DATA_DIR = process.env.VERCEL ? '/tmp/data' : path.join(__dirname, 'data');
+export const DB_FILE = path.join(DATA_DIR, 'loans.json');
+export const UPLOADS_DIR = process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, 'uploads');
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
