@@ -40,13 +40,13 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
   // WhatsApp click-to-chat helper
   const cleanPhone = loan.phoneNumber.replace(/[^0-9]/g, '');
   const booksText = loan.bookNames.join(', ');
-  let whatsappMsg = `Hello ${loan.borrowerName}, this is The Sanctuary Coffee Shop regarding your book loan ("${booksText}"). `;
+  let whatsappMsg = `Hello ${loan.borrowerName}, this is The Sanctuary regarding your book loan ("${booksText}"). `;
   if (loan.isOverdue) {
-    whatsappMsg += `Your return date was ${loan.committedReturnDate}. Please drop by when you can to return or extend it. Thank you! ☕`;
+    whatsappMsg += `Your scheduled return date was ${loan.committedReturnDate}. Please drop by when convenient to return or extend it. Thank you.`;
   } else if (loan.isDueToday) {
-    whatsappMsg += `Just a friendly reminder that it is due for return today. Looking forward to seeing you at the shop! ☕`;
+    whatsappMsg += `This is a reminder that it is due for return today. Thank you.`;
   } else {
-    whatsappMsg += `We hope you are enjoying your read! It is scheduled for return by ${loan.committedReturnDate}.`;
+    whatsappMsg += `Scheduled for return by ${loan.committedReturnDate}.`;
   }
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMsg)}`;
 
@@ -57,7 +57,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
       addToast({
         type: 'success',
         title: 'Loan Approved',
-        message: `Books for ${loan.borrowerName} are officially on loan!`,
+        message: `Loan for ${loan.borrowerName} has been approved.`,
       });
       await refreshData();
       onClose();
@@ -71,7 +71,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
 
   const handleReject = async () => {
     if (!rejectReason.trim()) {
-      addToast({ type: 'warning', title: 'Note required', message: 'Please provide a reason for rejecting' });
+      addToast({ type: 'warning', title: 'Note required', message: 'Please provide a reason for rejection.' });
       return;
     }
     setSubmitting(true);
@@ -79,7 +79,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
       await api.rejectLoan(loan.id, rejectReason);
       addToast({
         type: 'info',
-        title: 'Request Rejected',
+        title: 'Request Declined',
         message: `Loan ${loan.id} has been marked as rejected.`,
       });
       await refreshData();
@@ -99,7 +99,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
       addToast({
         type: 'success',
         title: 'Book Returned',
-        message: `Successfully marked "${booksText}" as returned!`,
+        message: `Marked "${booksText}" as returned.`,
       });
       await refreshData();
       onClose();
@@ -113,7 +113,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
 
   const handleExtend = async () => {
     if (!newDueDate) {
-      addToast({ type: 'warning', title: 'Date required', message: 'Please choose a new return date' });
+      addToast({ type: 'warning', title: 'Date required', message: 'Please choose a new return date.' });
       return;
     }
     setSubmitting(true);
@@ -122,7 +122,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
       addToast({
         type: 'success',
         title: 'Loan Extended',
-        message: `Committed return date updated to ${newDueDate}`,
+        message: `Return date updated to ${newDueDate}`,
       });
       await refreshData();
       onClose();
@@ -138,170 +138,160 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
   const getStatusBadge = () => {
     if (loan.status === 'pending') {
       return (
-        <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-amber-200">
-          <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-          Pending Staff Approval
+        <span className="px-2 py-0.5 bg-zinc-100 text-zinc-800 rounded text-[11px] font-medium flex items-center gap-1 border border-zinc-200">
+          <Clock className="w-3 h-3 text-zinc-500" />
+          Pending Approval
         </span>
       );
     }
     if (loan.isOverdue) {
       return (
-        <span className="px-3 py-1 bg-rose-100 text-rose-800 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-rose-200">
-          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-          Overdue ({Math.abs(loan.daysLeft || 0)} days)
+        <span className="px-2 py-0.5 bg-zinc-900 text-white rounded text-[11px] font-medium flex items-center gap-1">
+          <AlertTriangle className="w-3 h-3 text-white" />
+          Overdue ({Math.abs(loan.daysLeft || 0)}d)
         </span>
       );
     }
     if (loan.isDueToday) {
       return (
-        <span className="px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-amber-300">
-          <Clock className="w-3.5 h-3.5 text-amber-700" />
+        <span className="px-2 py-0.5 bg-zinc-800 text-white rounded text-[11px] font-medium flex items-center gap-1">
+          <Clock className="w-3 h-3 text-zinc-300" />
           Due Today
         </span>
       );
     }
     if (loan.status === 'active') {
       return (
-        <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-emerald-200">
-          <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-          Active Loan ({loan.daysLeft} days remaining)
+        <span className="px-2 py-0.5 bg-zinc-100 text-zinc-900 rounded text-[11px] font-medium flex items-center gap-1 border border-zinc-200">
+          <CheckCircle className="w-3 h-3 text-zinc-600" />
+          Active ({loan.daysLeft}d left)
         </span>
       );
     }
     if (loan.status === 'returned') {
       return (
-        <span className="px-3 py-1 bg-stone-100 text-stone-700 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-stone-300">
-          <RotateCcw className="w-3.5 h-3.5 text-stone-600" />
-          Returned to Shop
+        <span className="px-2 py-0.5 bg-zinc-100 text-zinc-500 rounded text-[11px] font-medium flex items-center gap-1 border border-zinc-200">
+          <RotateCcw className="w-3 h-3 text-zinc-400" />
+          Returned
         </span>
       );
     }
     return (
-      <span className="px-3 py-1 bg-rose-100 text-rose-800 rounded-full text-xs font-semibold border border-rose-200">
+      <span className="px-2 py-0.5 bg-zinc-100 text-zinc-500 rounded text-[11px] font-medium border border-zinc-200">
         Rejected
       </span>
     );
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-coffee-dark/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-sanctuary-200 my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in overflow-y-auto">
+      <div className="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-xl border border-zinc-200 my-6">
         {/* Header */}
-        <div className="bg-sanctuary-50 px-6 py-4 border-b border-sanctuary-200 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-mono font-bold text-sanctuary-800 bg-sanctuary-200/60 px-2.5 py-1 rounded-lg">
+        <div className="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono font-medium text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded">
               {loan.id}
             </span>
             {getStatusBadge()}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-sanctuary-200/60 text-stone-500 hover:text-stone-800 transition-colors"
+            className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
-          {/* Books being borrowed */}
-          <div className="bg-sanctuary-50/50 p-4 rounded-2xl border border-sanctuary-100">
-            <div className="flex items-center gap-2 text-sanctuary-900 font-semibold mb-2">
-              <BookOpen className="w-4 h-4 text-sanctuary-600" />
-              <span>Book(s) Borrowed ({loan.bookNames.length})</span>
-            </div>
-            <ul className="space-y-1.5">
+        <div className="p-5 space-y-4 max-h-[72vh] overflow-y-auto text-xs">
+          {/* Books */}
+          <div className="bg-zinc-50/80 p-3.5 rounded-xl border border-zinc-100 space-y-1">
+            <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400">
+              Book Title(s)
+            </span>
+            <ul className="space-y-1">
               {loan.bookNames.map((book, idx) => (
-                <li key={idx} className="font-serif font-bold text-coffee-dark text-lg flex items-start gap-2">
-                  <span className="text-sanctuary-400 mt-1">•</span>
+                <li key={idx} className="font-medium text-zinc-900 text-sm flex items-start gap-1.5">
+                  <span className="text-zinc-400">•</span>
                   <span>{book}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Photo of books */}
+          {/* Photo */}
           <div>
-            <div className="text-xs uppercase font-semibold tracking-wider text-sanctuary-700 mb-2">
-              Photo of Books at Checkout
-            </div>
-            <div className="relative rounded-2xl overflow-hidden border border-sanctuary-200 bg-stone-100 max-h-72 flex items-center justify-center group">
+            <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400 block mb-1.5">
+              Photo of Books
+            </span>
+            <div className="relative rounded-xl overflow-hidden border border-zinc-200 bg-zinc-100 max-h-56 flex items-center justify-center group">
               <img
                 src={loan.photoUrl}
                 alt="Borrowed books"
-                className="w-full h-64 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-48 object-cover object-center"
               />
               <a
                 href={loan.photoUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="absolute bottom-3 right-3 bg-black/60 hover:bg-black/80 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm flex items-center gap-1.5 transition-colors"
+                className="absolute bottom-2.5 right-2.5 bg-zinc-900/80 hover:bg-zinc-900 text-white text-[11px] px-2.5 py-1 rounded-md backdrop-blur-sm flex items-center gap-1 transition-colors"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                View Full Size
+                <ExternalLink className="w-3 h-3" />
+                Full Image
               </a>
             </div>
           </div>
 
-          {/* Borrower Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="text-xs uppercase font-semibold tracking-wider text-sanctuary-700">
+          {/* Borrower & Dates Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div className="space-y-2">
+              <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400 block">
                 Borrower Details
-              </div>
-              <div className="flex items-center gap-2.5 text-sm text-coffee-dark font-medium">
-                <User className="w-4 h-4 text-sanctuary-600" />
+              </span>
+              <div className="flex items-center gap-2 text-zinc-900 font-medium">
+                <User className="w-3.5 h-3.5 text-zinc-400" />
                 <span>{loan.borrowerName}</span>
               </div>
-              <div className="flex items-center gap-2.5 text-sm text-coffee-dark">
-                <Phone className="w-4 h-4 text-sanctuary-600" />
-                <a href={`tel:${loan.phoneNumber}`} className="text-sanctuary-700 hover:underline font-mono">
+              <div className="flex items-center gap-2 text-zinc-600">
+                <Phone className="w-3.5 h-3.5 text-zinc-400" />
+                <a href={`tel:${loan.phoneNumber}`} className="hover:underline font-mono">
                   {loan.phoneNumber}
                 </a>
               </div>
-              <div className="flex items-center gap-2.5 text-sm text-coffee-dark">
-                <Mail className="w-4 h-4 text-sanctuary-600" />
-                <a href={`mailto:${loan.email}`} className="text-sanctuary-700 hover:underline truncate">
+              <div className="flex items-center gap-2 text-zinc-600">
+                <Mail className="w-3.5 h-3.5 text-zinc-400" />
+                <a href={`mailto:${loan.email}`} className="hover:underline truncate">
                   {loan.email}
                 </a>
               </div>
               {loan.address && (
-                <div className="flex items-start gap-2.5 text-sm text-stone-600">
-                  <MapPin className="w-4 h-4 text-sanctuary-600 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 text-zinc-500">
+                  <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
                   <span>{loan.address}</span>
                 </div>
               )}
             </div>
 
-            <div className="space-y-3">
-              <div className="text-xs uppercase font-semibold tracking-wider text-sanctuary-700">
-                Lending Dates
+            <div className="space-y-2">
+              <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400 block">
+                Lending Schedule
+              </span>
+              <div className="flex items-center gap-2 text-zinc-600">
+                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Borrowed: <strong className="text-zinc-800">{loan.borrowDate}</strong></span>
               </div>
-              <div className="flex items-center gap-2.5 text-sm">
-                <Calendar className="w-4 h-4 text-sanctuary-600" />
-                <span>
-                  <strong className="text-stone-700">Borrowed:</strong> {loan.borrowDate}
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5 text-sm">
-                <Calendar className="w-4 h-4 text-sanctuary-600" />
-                <span>
-                  <strong className="text-stone-700">Committed Due Date:</strong>{' '}
-                  <span className={loan.isOverdue ? 'text-rose-700 font-bold' : loan.isDueToday ? 'text-amber-800 font-bold' : 'text-coffee-dark'}>
-                    {loan.committedReturnDate}
-                  </span>
-                </span>
+              <div className="flex items-center gap-2 text-zinc-600">
+                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Due Date: <strong className={loan.isOverdue ? 'text-zinc-950 font-bold' : 'text-zinc-800'}>{loan.committedReturnDate}</strong></span>
               </div>
               {loan.returnDate && (
-                <div className="flex items-center gap-2.5 text-sm text-emerald-800">
-                  <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span>
-                    <strong>Returned on:</strong> {loan.returnDate}
-                  </span>
+                <div className="flex items-center gap-2 text-zinc-600">
+                  <CheckCircle className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>Returned: <strong className="text-zinc-800">{loan.returnDate}</strong></span>
                 </div>
               )}
               {loan.notes && (
-                <div className="text-xs text-stone-600 italic bg-amber-50/50 p-2 rounded-lg border border-amber-100">
+                <div className="text-[11px] text-zinc-500 italic bg-zinc-50 p-2 rounded-lg border border-zinc-100">
                   &ldquo;{loan.notes}&rdquo;
                 </div>
               )}
@@ -309,46 +299,48 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
           </div>
 
           {/* Quick contact shortcuts */}
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-sanctuary-100">
-            <span className="text-xs text-stone-500 font-medium">Quick Contact:</span>
+          <div className="flex items-center gap-2 pt-2 border-t border-zinc-100">
+            <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400 mr-1">
+              Contact:
+            </span>
             <a
               href={`tel:${loan.phoneNumber}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs rounded-lg transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-md transition-colors"
             >
-              <Phone className="w-3.5 h-3.5 text-sanctuary-700" /> Call
+              <Phone className="w-3 h-3 text-zinc-500" /> Call
             </a>
             <a
-              href={`mailto:${loan.email}?subject=The%20Sanctuary%20Book%20Loan%20-${encodeURIComponent(loan.bookNames[0])}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs rounded-lg transition-colors"
+              href={`mailto:${loan.email}`}
+              className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-md transition-colors"
             >
-              <Mail className="w-3.5 h-3.5 text-sanctuary-700" /> Email
+              <Mail className="w-3 h-3 text-zinc-500" /> Email
             </a>
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md transition-colors"
             >
-              <MessageCircle className="w-3.5 h-3.5 text-emerald-600" /> WhatsApp Reminder
+              <MessageCircle className="w-3 h-3" /> WhatsApp
             </a>
           </div>
 
           {/* Rejection / Return / Extend Dialogs */}
           {showRejectInput && (
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl space-y-3">
-              <h5 className="font-semibold text-rose-950 text-sm">State Reason for Rejecting</h5>
+            <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+              <span className="font-medium text-zinc-900">Reason for Rejection</span>
               <input
                 type="text"
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="e.g., Book is currently reserved for book club"
-                className="w-full text-sm p-2.5 rounded-xl border border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                placeholder="e.g., Book currently unavailable"
+                className="w-full text-xs p-2 rounded-lg border border-zinc-200 bg-white"
               />
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setShowRejectInput(false)}
-                  className="px-3 py-1.5 text-xs text-stone-600 hover:bg-rose-100 rounded-lg"
+                  className="px-2.5 py-1 text-zinc-600 hover:bg-zinc-200 rounded"
                 >
                   Cancel
                 </button>
@@ -356,7 +348,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
                   type="button"
                   onClick={handleReject}
                   disabled={submitting}
-                  className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg disabled:opacity-50"
+                  className="px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded"
                 >
                   Confirm Rejection
                 </button>
@@ -365,14 +357,14 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
           )}
 
           {showReturnInput && (
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-3">
-              <h5 className="font-semibold text-emerald-950 text-sm">Mark Book as Returned</h5>
+            <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+              <span className="font-medium text-zinc-900">Mark as Returned</span>
               <div>
-                <label className="text-xs text-emerald-900 font-medium">Book Condition</label>
+                <label className="text-[11px] text-zinc-600 block">Book Condition</label>
                 <select
                   value={returnCondition}
                   onChange={(e) => setReturnCondition(e.target.value)}
-                  className="w-full text-sm mt-1 p-2 rounded-xl border border-emerald-300 bg-white"
+                  className="w-full text-xs mt-1 p-1.5 rounded-lg border border-zinc-200 bg-white"
                 >
                   <option value="Pristine / Like New">Pristine / Like New</option>
                   <option value="Good condition">Good condition</option>
@@ -380,21 +372,11 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
                   <option value="Spine or page damage">Spine or page damage</option>
                 </select>
               </div>
-              <div>
-                <label className="text-xs text-emerald-900 font-medium">Notes (optional)</label>
-                <input
-                  type="text"
-                  value={returnNotes}
-                  onChange={(e) => setReturnNotes(e.target.value)}
-                  placeholder="e.g., Returned on counter by borrower"
-                  className="w-full text-sm mt-1 p-2 rounded-xl border border-emerald-300 bg-white"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
+              <div className="flex gap-2 justify-end pt-1">
                 <button
                   type="button"
                   onClick={() => setShowReturnInput(false)}
-                  className="px-3 py-1.5 text-xs text-stone-600 hover:bg-emerald-100 rounded-lg"
+                  className="px-2.5 py-1 text-zinc-600 hover:bg-zinc-200 rounded"
                 >
                   Cancel
                 </button>
@@ -402,7 +384,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
                   type="button"
                   onClick={handleReturn}
                   disabled={submitting}
-                  className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg disabled:opacity-50"
+                  className="px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded"
                 >
                   Confirm Return
                 </button>
@@ -411,20 +393,20 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
           )}
 
           {showExtendInput && (
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-3">
-              <h5 className="font-semibold text-amber-950 text-sm">Extend Committed Return Date</h5>
+            <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+              <span className="font-medium text-zinc-900">Extend Due Date</span>
               <input
                 type="date"
                 value={newDueDate}
                 onChange={(e) => setNewDueDate(e.target.value)}
                 min={loan.committedReturnDate}
-                className="w-full text-sm p-2.5 rounded-xl border border-amber-300 bg-white"
+                className="w-full text-xs p-2 rounded-lg border border-zinc-200 bg-white"
               />
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setShowExtendInput(false)}
-                  className="px-3 py-1.5 text-xs text-stone-600 hover:bg-amber-100 rounded-lg"
+                  className="px-2.5 py-1 text-zinc-600 hover:bg-zinc-200 rounded"
                 >
                   Cancel
                 </button>
@@ -432,7 +414,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
                   type="button"
                   onClick={handleExtend}
                   disabled={submitting}
-                  className="px-4 py-1.5 bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold rounded-lg disabled:opacity-50"
+                  className="px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded"
                 >
                   Save Extension
                 </button>
@@ -441,49 +423,47 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose 
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="bg-stone-50 px-6 py-4 border-t border-sanctuary-200 flex flex-wrap items-center justify-between gap-3">
+        {/* Footer */}
+        <div className="bg-zinc-50 px-5 py-3 border-t border-zinc-100 flex items-center justify-between text-xs">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-stone-600 hover:text-stone-900 text-sm font-medium"
+            className="text-zinc-500 hover:text-zinc-900 font-medium"
           >
             Close
           </button>
 
           <div className="flex items-center gap-2">
-            {/* If pending: Approve / Reject buttons */}
             {loan.status === 'pending' && !showRejectInput && (
               <>
                 <button
                   onClick={() => setShowRejectInput(true)}
-                  className="px-4 py-2 border border-rose-300 hover:bg-rose-50 text-rose-700 font-medium text-sm rounded-xl transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 border border-zinc-200 hover:bg-zinc-100 text-zinc-700 font-medium rounded-lg transition-colors"
                 >
-                  <XCircle className="w-4 h-4" /> Reject
+                  Reject
                 </button>
                 <button
                   onClick={handleApprove}
                   disabled={submitting}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-xl shadow-warm transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-lg transition-colors flex items-center gap-1.5"
                 >
-                  <CheckCircle className="w-4 h-4" /> Approve Borrow Request
+                  <CheckCircle className="w-3.5 h-3.5" /> Approve Request
                 </button>
               </>
             )}
 
-            {/* If active or overdue: Return / Extend */}
             {loan.status === 'active' && !showReturnInput && !showExtendInput && (
               <>
                 <button
                   onClick={() => setShowExtendInput(true)}
-                  className="px-3 py-2 border border-sanctuary-300 hover:bg-sanctuary-50 text-coffee-dark font-medium text-sm rounded-xl transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 border border-zinc-200 hover:bg-zinc-100 text-zinc-700 font-medium rounded-lg transition-colors"
                 >
-                  <Calendar className="w-4 h-4 text-sanctuary-600" /> Extend
+                  Extend Date
                 </button>
                 <button
                   onClick={() => setShowReturnInput(true)}
-                  className="px-5 py-2 bg-sanctuary-800 hover:bg-sanctuary-900 text-white font-medium text-sm rounded-xl shadow-warm transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-lg transition-colors flex items-center gap-1.5"
                 >
-                  <RotateCcw className="w-4 h-4" /> Mark as Returned
+                  <RotateCcw className="w-3.5 h-3.5" /> Mark Returned
                 </button>
               </>
             )}

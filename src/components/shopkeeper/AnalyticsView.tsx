@@ -9,32 +9,26 @@ import {
   BookOpen,
   CheckCircle,
   AlertTriangle,
-  RotateCcw,
-  Sparkles
+  RotateCcw
 } from 'lucide-react';
 import { useSanctuary } from '../../context/SanctuaryContext';
 
 export const AnalyticsView: React.FC = () => {
   const { loans } = useSanctuary();
   const currentYear = new Date().getFullYear().toString();
-  const currentMonthNum = (new Date().getMonth() + 1).toString();
 
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState('');
   const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     api.getAnalytics(selectedYear, selectedMonth || undefined)
       .then((res) => {
         setData(res);
       })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+      .catch((err) => console.error(err));
   }, [selectedYear, selectedMonth]);
 
-  // Export to CSV helper
   const handleExportCSV = () => {
     if (!loans || loans.length === 0) return;
 
@@ -64,60 +58,59 @@ export const AnalyticsView: React.FC = () => {
 
   const monthsList = [
     { num: '', label: 'All Months' },
-    { num: '1', label: 'January' },
-    { num: '2', label: 'February' },
-    { num: '3', label: 'March' },
-    { num: '4', label: 'April' },
+    { num: '1', label: 'Jan' },
+    { num: '2', label: 'Feb' },
+    { num: '3', label: 'Mar' },
+    { num: '4', label: 'Apr' },
     { num: '5', label: 'May' },
-    { num: '6', label: 'June' },
-    { num: '7', label: 'July' },
-    { num: '8', label: 'August' },
-    { num: '9', label: 'September' },
-    { num: '10', label: 'October' },
-    { num: '11', label: 'November' },
-    { num: '12', label: 'December' },
+    { num: '6', label: 'Jun' },
+    { num: '7', label: 'Jul' },
+    { num: '8', label: 'Aug' },
+    { num: '9', label: 'Sep' },
+    { num: '10', label: 'Oct' },
+    { num: '11', label: 'Nov' },
+    { num: '12', label: 'Dec' },
   ];
 
-  // Max value in monthly data for scaling bars
   const maxMonthlyVal = data?.monthlyData ? Math.max(...data.monthlyData.map(m => m.totalLoans), 1) : 1;
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Filters & Export Header */}
-      <div className="bg-white p-5 rounded-3xl border border-sanctuary-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4 animate-fade-in text-xs">
+      {/* Header & Controls */}
+      <div className="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-sanctuary-700" />
+          <BarChart3 className="w-4 h-4 text-zinc-700" />
           <div>
-            <h3 className="font-serif font-bold text-lg text-coffee-dark">
-              Loan Analytics & Lending History
+            <h3 className="font-semibold text-sm text-zinc-900">
+              Loan Analytics
             </h3>
-            <p className="text-xs text-stone-500">
-              Filtered lending patterns and coffee shop book circulation
+            <p className="text-[11px] text-zinc-400">
+              Circulation history and lending volume
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Year selector */}
-          <div className="flex items-center gap-1.5 bg-sanctuary-50 px-3 py-1.5 rounded-xl border border-sanctuary-200 text-xs">
-            <Calendar className="w-3.5 h-3.5 text-sanctuary-600" />
+          <div className="flex items-center gap-1 bg-zinc-100 px-2 py-1 rounded-md border border-zinc-200/60 text-xs">
+            <Calendar className="w-3 h-3 text-zinc-400" />
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="bg-transparent font-semibold text-sanctuary-900 focus:outline-none cursor-pointer"
+              className="bg-transparent font-medium text-zinc-800 focus:outline-none cursor-pointer"
             >
-              <option value="2026">Year 2026</option>
-              <option value="2025">Year 2025</option>
-              <option value="2024">Year 2024</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
             </select>
           </div>
 
           {/* Month selector */}
-          <div className="flex items-center gap-1.5 bg-sanctuary-50 px-3 py-1.5 rounded-xl border border-sanctuary-200 text-xs">
+          <div className="flex items-center gap-1 bg-zinc-100 px-2 py-1 rounded-md border border-zinc-200/60 text-xs">
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent font-semibold text-sanctuary-900 focus:outline-none cursor-pointer"
+              className="bg-transparent font-medium text-zinc-800 focus:outline-none cursor-pointer"
             >
               {monthsList.map((m) => (
                 <option key={m.num} value={m.num}>
@@ -127,86 +120,79 @@ export const AnalyticsView: React.FC = () => {
             </select>
           </div>
 
-          {/* CSV Download */}
+          {/* CSV Export */}
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-sanctuary-800 hover:bg-sanctuary-900 text-white text-xs font-semibold rounded-xl shadow-warm transition-all"
-            title="Download CSV report"
+            className="flex items-center gap-1.5 px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-md transition-colors"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3 h-3" />
             <span>Export CSV</span>
           </button>
         </div>
       </div>
 
-      {/* Analytics KPI Row */}
+      {/* KPI Cards */}
       {data && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white p-4 rounded-2xl border border-sanctuary-200 shadow-sm">
-            <span className="text-xs font-semibold text-stone-500 block">Total Loans Logged</span>
-            <span className="font-mono text-2xl font-extrabold text-coffee-dark mt-1 block">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-sm">
+            <span className="text-[10px] uppercase font-semibold text-zinc-400 block">Total Loans</span>
+            <span className="font-mono text-xl font-bold text-zinc-900 mt-1 block">
               {data.totalRecorded}
             </span>
-            <span className="text-[11px] text-stone-400">Coffee shop records</span>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-sanctuary-200 shadow-sm">
-            <span className="text-xs font-semibold text-stone-500 block">On-Time Return Rate</span>
-            <span className="font-mono text-2xl font-extrabold text-emerald-700 mt-1 block">
+          <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-sm">
+            <span className="text-[10px] uppercase font-semibold text-zinc-400 block">On-Time Rate</span>
+            <span className="font-mono text-xl font-bold text-zinc-900 mt-1 block">
               88%
             </span>
-            <span className="text-[11px] text-emerald-600 font-medium">Healthy circulation</span>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-sanctuary-200 shadow-sm">
-            <span className="text-xs font-semibold text-stone-500 block">Avg. Loan Duration</span>
-            <span className="font-mono text-2xl font-extrabold text-sanctuary-800 mt-1 block">
+          <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-sm">
+            <span className="text-[10px] uppercase font-semibold text-zinc-400 block">Avg. Duration</span>
+            <span className="font-mono text-xl font-bold text-zinc-900 mt-1 block">
               11.4 Days
             </span>
-            <span className="text-[11px] text-stone-400">Under 14d policy</span>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-sanctuary-200 shadow-sm">
-            <span className="text-xs font-semibold text-stone-500 block">Overdue Recovery</span>
-            <span className="font-mono text-2xl font-extrabold text-amber-700 mt-1 block">
-              94%
+          <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-sm">
+            <span className="text-[10px] uppercase font-semibold text-zinc-400 block">Active Borrows</span>
+            <span className="font-mono text-xl font-bold text-zinc-900 mt-1 block">
+              {data.statusCounts.active + data.statusCounts.dueToday + data.statusCounts.overdue}
             </span>
-            <span className="text-[11px] text-amber-600 font-medium">Via WhatsApp reminder</span>
           </div>
         </div>
       )}
 
-      {/* Visual Chart: Monthly Trends */}
-      <div className="bg-white p-6 rounded-3xl border border-sanctuary-200 shadow-sm space-y-4">
+      {/* Monthly Chart */}
+      <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-serif font-bold text-coffee-dark text-base flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-sanctuary-600" />
+          <h4 className="font-medium text-zinc-900 text-xs flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-zinc-400" />
             <span>Monthly Lending Volume ({selectedYear})</span>
           </h4>
-          <span className="text-xs text-stone-500">Loans initiated per month</span>
         </div>
 
-        {/* Bar chart */}
-        <div className="pt-4 pb-2">
-          <div className="grid grid-cols-12 gap-1.5 sm:gap-3 items-end h-48 border-b border-sanctuary-200 pb-2">
+        <div className="pt-2">
+          <div className="grid grid-cols-12 gap-1.5 sm:gap-2 items-end h-40 border-b border-zinc-100 pb-2">
             {data?.monthlyData.map((m) => {
-              const heightPercent = Math.max(Math.round((m.totalLoans / maxMonthlyVal) * 100), 6);
-              const isCurrentMonth = m.monthNum === 10; // October
+              const heightPercent = Math.max(Math.round((m.totalLoans / maxMonthlyVal) * 100), 4);
+              const isCurrentMonth = m.monthNum === 10;
 
               return (
                 <div key={m.month} className="flex flex-col items-center h-full justify-end group">
-                  <span className="text-[10px] text-sanctuary-800 font-bold opacity-0 group-hover:opacity-100 transition-opacity mb-1 font-mono">
+                  <span className="text-[9px] text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity mb-1 font-mono">
                     {m.totalLoans}
                   </span>
                   <div
                     style={{ height: `${heightPercent}%` }}
-                    className={`w-full max-w-[28px] rounded-t-lg transition-all duration-500 ${
+                    className={`w-full max-w-[20px] rounded-t transition-all ${
                       isCurrentMonth
-                        ? 'bg-gradient-to-t from-sanctuary-800 to-sanctuary-600 shadow-sm'
-                        : 'bg-sanctuary-200 group-hover:bg-sanctuary-400'
+                        ? 'bg-zinc-900'
+                        : 'bg-zinc-200 group-hover:bg-zinc-400'
                     }`}
                   />
-                  <span className={`text-[10px] mt-2 font-medium ${isCurrentMonth ? 'font-bold text-sanctuary-950' : 'text-stone-400'}`}>
+                  <span className={`text-[9px] mt-1.5 ${isCurrentMonth ? 'font-bold text-zinc-900' : 'text-zinc-400'}`}>
                     {m.month}
                   </span>
                 </div>
@@ -217,78 +203,78 @@ export const AnalyticsView: React.FC = () => {
       </div>
 
       {/* Popular Books & Status Breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Top 5 Most Borrowed */}
-        <div className="bg-white p-6 rounded-3xl border border-sanctuary-200 shadow-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-sanctuary-600" />
-            <h4 className="font-serif font-bold text-coffee-dark text-base">
-              Most Borrowed Cafe Titles
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Most Borrowed */}
+        <div className="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
+          <div className="flex items-center gap-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
+            <h4 className="font-medium text-zinc-900 text-xs">
+              Popular Books
             </h4>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {data?.popularBooks && data.popularBooks.length > 0 ? (
               data.popularBooks.map((b, i) => (
                 <div key={i} className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-serif font-bold text-coffee-dark truncate max-w-[220px]">
+                  <div className="flex justify-between text-[11px]">
+                    <span className="font-medium text-zinc-800 truncate max-w-[200px]">
                       {b.title}
                     </span>
-                    <span className="font-mono text-sanctuary-800 font-semibold">
-                      {b.count} loans
+                    <span className="font-mono text-zinc-500 font-medium">
+                      {b.count}
                     </span>
                   </div>
-                  <div className="w-full bg-sanctuary-100 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-sanctuary-700 h-2 rounded-full"
+                      className="bg-zinc-900 h-1.5 rounded-full"
                       style={{ width: `${Math.min(b.count * 30, 100)}%` }}
                     />
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-stone-400 py-4 text-center">No book data available</p>
+              <p className="text-[11px] text-zinc-400 py-3 text-center">No data</p>
             )}
           </div>
         </div>
 
-        {/* Current Active Loans Status Ratio */}
-        <div className="bg-white p-6 rounded-3xl border border-sanctuary-200 shadow-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <RotateCcw className="w-4 h-4 text-sanctuary-600" />
-            <h4 className="font-serif font-bold text-coffee-dark text-base">
-              Circulation Breakdown
+        {/* Status Ratio */}
+        <div className="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
+          <div className="flex items-center gap-1.5">
+            <RotateCcw className="w-3.5 h-3.5 text-zinc-400" />
+            <h4 className="font-medium text-zinc-900 text-xs">
+              Status Breakdown
             </h4>
           </div>
 
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50 text-emerald-950 border border-emerald-100">
-              <span className="text-xs font-semibold flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-600" /> Active & On-Schedule
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-100">
+              <span className="text-[11px] font-medium flex items-center gap-1.5 text-zinc-700">
+                <CheckCircle className="w-3 h-3 text-zinc-500" /> Active Loans
               </span>
-              <span className="font-mono font-bold text-sm">{data?.statusCounts.active || 0}</span>
+              <span className="font-mono font-medium text-xs text-zinc-900">{data?.statusCounts.active || 0}</span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-orange-50 text-orange-950 border border-orange-100">
-              <span className="text-xs font-semibold flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-orange-600" /> Due for Return Today
+            <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-100">
+              <span className="text-[11px] font-medium flex items-center gap-1.5 text-zinc-700">
+                <Calendar className="w-3 h-3 text-zinc-500" /> Due Today
               </span>
-              <span className="font-mono font-bold text-sm">{data?.statusCounts.dueToday || 0}</span>
+              <span className="font-mono font-medium text-xs text-zinc-900">{data?.statusCounts.dueToday || 0}</span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-rose-50 text-rose-950 border border-rose-100">
-              <span className="text-xs font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-600" /> Overdue Books
+            <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-100">
+              <span className="text-[11px] font-medium flex items-center gap-1.5 text-zinc-700">
+                <AlertTriangle className="w-3 h-3 text-zinc-500" /> Overdue
               </span>
-              <span className="font-mono font-bold text-sm">{data?.statusCounts.overdue || 0}</span>
+              <span className="font-mono font-medium text-xs text-zinc-900">{data?.statusCounts.overdue || 0}</span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 text-stone-800 border border-stone-200">
-              <span className="text-xs font-semibold flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-stone-600" /> Safely Returned to Lounge
+            <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-100">
+              <span className="text-[11px] font-medium flex items-center gap-1.5 text-zinc-700">
+                <RotateCcw className="w-3 h-3 text-zinc-500" /> Returned
               </span>
-              <span className="font-mono font-bold text-sm">{data?.statusCounts.returned || 0}</span>
+              <span className="font-mono font-medium text-xs text-zinc-900">{data?.statusCounts.returned || 0}</span>
             </div>
           </div>
         </div>

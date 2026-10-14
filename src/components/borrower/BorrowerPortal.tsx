@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LendingForm } from './LendingForm';
 import { SubmissionSuccess } from './SubmissionSuccess';
 import { Loan } from '../../types/loan';
-import { Coffee, BookOpen, QrCode, ShieldCheck, Heart } from 'lucide-react';
+import { BookOpen, QrCode, ShieldCheck } from 'lucide-react';
 
 export const BorrowerPortal: React.FC = () => {
   const [submittedLoan, setSubmittedLoan] = useState<Loan | null>(null);
@@ -12,31 +12,29 @@ export const BorrowerPortal: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-6 sm:py-10 px-4 sm:px-0 space-y-8 animate-fade-in">
-      {/* Hero Welcome Banner */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sanctuary-100 text-sanctuary-800 text-xs font-semibold border border-sanctuary-200">
-          <QrCode className="w-3.5 h-3.5 text-sanctuary-700" />
-          <span>Scanned from Cafe Table QR Code</span>
+    <div className="max-w-xl mx-auto py-6 sm:py-8 px-4 sm:px-0 space-y-6 animate-fade-in">
+      {/* Minimalist Header */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-medium border border-zinc-200/70">
+          <QrCode className="w-3 h-3 text-zinc-500" />
+          <span>Table Lending Portal</span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-coffee-dark tracking-tight">
-          Borrow a Book at The Sanctuary
+        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
+          Borrow a Book
         </h1>
-        <p className="text-sm text-stone-600 max-w-lg mx-auto leading-relaxed">
-          Grab a coffee, pick a favorite title from our shelves, and take it with you. Fill in your details below and present your confirmation to the barista.
+        <p className="text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">
+          Select your title, complete the lending form below, and present your screen to the counter.
         </p>
 
-        {/* Feature Highlights Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-stone-600">
-          <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full border border-sanctuary-200 shadow-sm">
-            <Coffee className="w-3.5 h-3.5 text-sanctuary-600" /> Free with any beverage
+        {/* Feature Pills */}
+        <div className="flex items-center justify-center gap-3 pt-1 text-[11px] text-zinc-500">
+          <span className="flex items-center gap-1">
+            <BookOpen className="w-3 h-3 text-zinc-400" /> 14-day standard lending
           </span>
-          <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full border border-sanctuary-200 shadow-sm">
-            <BookOpen className="w-3.5 h-3.5 text-sanctuary-600" /> 14-day standard return
-          </span>
-          <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full border border-sanctuary-200 shadow-sm">
-            <ShieldCheck className="w-3.5 h-3.5 text-sanctuary-600" /> Secure & private
+          <span className="text-zinc-300">•</span>
+          <span className="flex items-center gap-1">
+            <ShieldCheck className="w-3 h-3 text-zinc-400" /> Secure checkout
           </span>
         </div>
       </div>
@@ -44,11 +42,9 @@ export const BorrowerPortal: React.FC = () => {
       {/* Lending Form */}
       <LendingForm onSuccess={(loan) => setSubmittedLoan(loan)} />
 
-      {/* Warm Footer Note */}
-      <div className="text-center text-xs text-stone-400 flex items-center justify-center gap-1 pt-4">
-        <span>Made with</span>
-        <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
-        <span>for book lovers at The Sanctuary Cafe</span>
+      {/* Minimalist Footer */}
+      <div className="text-center text-[10px] text-zinc-400 pt-2">
+        <span>The Sanctuary Library & Lounge</span>
       </div>
     </div>
   );

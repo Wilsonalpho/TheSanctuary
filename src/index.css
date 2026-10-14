@@ -3,31 +3,40 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    background-color: #fbf9f5;
-    color: #1c130e;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  html {
+    font-size: 14px; /* Crisp, neat professional compact base size */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, .font-serif {
-    font-family: 'Playfair Display', Georgia, serif;
+  body {
+    background-color: #fafafa;
+    color: #18181b;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.011em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em;
+    font-weight: 600;
   }
 }
 
-/* Custom subtle scrollbar */
+/* Minimalist hair-thin scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5eee6;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #debfa4;
-  border-radius: 4px;
+  background: #d4d4d8;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c79870;
+  background: #a1a1aa;
 }
 
 /* Print styling for Counter QR standee */
@@ -44,6 +53,6 @@
     top: 0;
     width: 100%;
     margin: 0;
-    padding: 20px;
+    padding: 24px;
   }
 }

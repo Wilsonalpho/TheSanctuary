@@ -5,8 +5,7 @@ import {
   BookOpen,
   CalendarCheck,
   AlertTriangle,
-  RotateCcw,
-  BookMarked
+  RotateCcw
 } from 'lucide-react';
 
 interface StatsCardsProps {
@@ -23,10 +22,6 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ currentFilter, onSelectF
       label: 'Pending Approval',
       count: stats?.pendingCount || 0,
       icon: Clock,
-      color: 'amber',
-      bgClass: 'bg-amber-50 hover:bg-amber-100/80 border-amber-200 text-amber-950',
-      activeClass: 'ring-2 ring-amber-500 bg-amber-100',
-      badgeClass: 'bg-amber-200 text-amber-900',
       alert: (stats?.pendingCount || 0) > 0,
     },
     {
@@ -34,10 +29,6 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ currentFilter, onSelectF
       label: 'Active Loans',
       count: stats?.activeCount || 0,
       icon: BookOpen,
-      color: 'emerald',
-      bgClass: 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-200 text-emerald-950',
-      activeClass: 'ring-2 ring-emerald-500 bg-emerald-100',
-      badgeClass: 'bg-emerald-200 text-emerald-900',
       alert: false,
     },
     {
@@ -45,10 +36,6 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ currentFilter, onSelectF
       label: 'Due Today',
       count: stats?.dueTodayCount || 0,
       icon: CalendarCheck,
-      color: 'orange',
-      bgClass: 'bg-orange-50 hover:bg-orange-100/80 border-orange-200 text-orange-950',
-      activeClass: 'ring-2 ring-orange-500 bg-orange-100',
-      badgeClass: 'bg-orange-200 text-orange-900',
       alert: (stats?.dueTodayCount || 0) > 0,
     },
     {
@@ -56,10 +43,6 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ currentFilter, onSelectF
       label: 'Overdue Books',
       count: stats?.overdueCount || 0,
       icon: AlertTriangle,
-      color: 'rose',
-      bgClass: 'bg-rose-50 hover:bg-rose-100/80 border-rose-200 text-rose-950',
-      activeClass: 'ring-2 ring-rose-500 bg-rose-100',
-      badgeClass: 'bg-rose-200 text-rose-900',
       alert: (stats?.overdueCount || 0) > 0,
     },
     {
@@ -67,16 +50,12 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ currentFilter, onSelectF
       label: 'Total Returned',
       count: stats?.returnedCount || 0,
       icon: RotateCcw,
-      color: 'stone',
-      bgClass: 'bg-stone-50 hover:bg-stone-100/80 border-stone-200 text-stone-900',
-      activeClass: 'ring-2 ring-stone-500 bg-stone-100',
-      badgeClass: 'bg-stone-200 text-stone-800',
       alert: false,
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
       {cards.map((card) => {
         const Icon = card.icon;
         const isSelected = currentFilter === card.id;
@@ -86,26 +65,25 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ currentFilter, onSelectF
             key={card.id}
             type="button"
             onClick={() => onSelectFilter(card.id)}
-            className={`p-4 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between shadow-sm cursor-pointer relative overflow-hidden ${
-              card.bgClass
-            } ${isSelected ? card.activeClass : ''}`}
+            className={`p-3.5 rounded-xl border text-left transition-colors duration-150 flex flex-col justify-between bg-white shadow-sm cursor-pointer ${
+              isSelected
+                ? 'border-zinc-900 bg-zinc-50/50'
+                : 'border-zinc-200/80 hover:border-zinc-300'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold tracking-tight text-stone-600 truncate">
+              <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-500 truncate">
                 {card.label}
               </span>
-              <Icon className="w-4 h-4 text-stone-500 shrink-0" />
+              <Icon className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
             </div>
 
-            <div className="mt-3 flex items-baseline justify-between">
-              <span className="text-2xl sm:text-3xl font-extrabold font-mono tracking-tight">
+            <div className="mt-2.5 flex items-baseline justify-between">
+              <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-zinc-900">
                 {card.count}
               </span>
               {card.alert && (
-                <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
-                </span>
+                <span className="flex h-1.5 w-1.5 rounded-full bg-zinc-900"></span>
               )}
             </div>
           </button>

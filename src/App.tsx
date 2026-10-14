@@ -26,7 +26,7 @@ const AppContent: React.FC = () => {
   }, [setActiveTab]);
 
   return (
-    <div className="min-h-screen bg-[#fbf9f5] flex flex-col font-sans selection:bg-sanctuary-200">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans selection:bg-zinc-900 selection:text-white">
       {/* Top Header Navigation */}
       <Navbar />
 

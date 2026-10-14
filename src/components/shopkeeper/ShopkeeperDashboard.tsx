@@ -9,17 +9,15 @@ import {
   Clock,
   AlertTriangle,
   BarChart3,
-  Coffee,
   RotateCcw,
-  Sparkles,
   QrCode,
   Radio,
-  Bell
+  Library
 } from 'lucide-react';
 import { CounterQRModal } from '../common/CounterQRModal';
 
 export const ShopkeeperDashboard: React.FC = () => {
-  const { loans, stats, notifications, sseConnected, refreshData } = useSanctuary();
+  const { loans, stats, refreshData } = useSanctuary();
 
   const [activeSubTab, setActiveSubTab] = useState<'loans' | 'approvals' | 'analytics'>('loans');
   const [currentFilter, setCurrentFilter] = useState<string>('all');
@@ -30,16 +28,13 @@ export const ShopkeeperDashboard: React.FC = () => {
   const overdueCount = stats?.overdueCount || 0;
   const dueTodayCount = stats?.dueTodayCount || 0;
 
-  // Filtered loans for table
   const filteredLoans = loans.filter((loan) => {
-    // Filter by tab
     if (currentFilter === 'pending' && loan.status !== 'pending') return false;
     if (currentFilter === 'active' && (loan.status !== 'active' || loan.isOverdue || loan.isDueToday)) return false;
     if (currentFilter === 'due_today' && !loan.isDueToday) return false;
     if (currentFilter === 'overdue' && !loan.isOverdue) return false;
     if (currentFilter === 'returned' && loan.status !== 'returned') return false;
 
-    // Search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchName = loan.borrowerName.toLowerCase().includes(q);
@@ -53,74 +48,74 @@ export const ShopkeeperDashboard: React.FC = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8 space-y-6 animate-fade-in">
-      {/* Top Banner & Shop Info */}
-      <div className="bg-white rounded-3xl border border-sanctuary-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-sanctuary-900 text-sanctuary-200 flex items-center justify-center shadow-warm">
-            <Coffee className="w-6 h-6" />
+    <div className="max-w-7xl mx-auto py-5 sm:py-6 px-4 sm:px-6 space-y-4 animate-fade-in text-xs">
+      {/* Top Banner */}
+      <div className="bg-white rounded-2xl border border-zinc-200/80 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-lg bg-zinc-900 text-white flex items-center justify-center">
+            <Library className="w-4 h-4 text-zinc-100" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-serif text-2xl font-black text-coffee-dark">
-                Shopkeeper Command Hub
+              <h1 className="font-semibold text-base text-zinc-950 tracking-tight">
+                Shopkeeper Dashboard
               </h1>
-              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                <Radio className="w-2.5 h-2.5 text-emerald-600 animate-pulse" />
-                Live Sync
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.2 rounded bg-zinc-100 text-zinc-600 border border-zinc-200">
+                <Radio className="w-2 h-2 text-zinc-900" />
+                Live
               </span>
             </div>
-            <p className="text-xs text-stone-500">
-              Manage book lending requests, monitor returns, and track reading circulation
+            <p className="text-[11px] text-zinc-400">
+              Loan management, returns, and circulation
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setShowQRModal(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sanctuary-100/70 hover:bg-sanctuary-200/80 text-sanctuary-900 text-xs font-semibold border border-sanctuary-200 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/70 text-zinc-800 text-xs font-medium transition-colors"
           >
-            <QrCode className="w-4 h-4 text-sanctuary-700" />
-            <span>Counter Standee</span>
+            <QrCode className="w-3.5 h-3.5 text-zinc-500" />
+            <span>Standee QR</span>
           </button>
 
           <button
             onClick={() => refreshData()}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-medium transition-colors"
-            title="Refresh database"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-medium transition-colors"
+            title="Refresh records"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3.5 h-3.5 text-zinc-400" />
             <span>Refresh</span>
           </button>
         </div>
       </div>
 
-      {/* Real-time Alerts Banner for Due Today & Overdue */}
+      {/* Alert Notices */}
       {(overdueCount > 0 || dueTodayCount > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
           {overdueCount > 0 && (
             <div
               onClick={() => {
                 setActiveSubTab('loans');
                 setCurrentFilter('overdue');
               }}
-              className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-rose-100/80 transition-all shadow-sm"
+              className="bg-white border border-zinc-200 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:border-zinc-300 transition-colors shadow-sm"
             >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-rose-200/60 rounded-xl text-rose-800">
-                  <AlertTriangle className="w-5 h-5 text-rose-600 animate-pulse" />
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-zinc-100 rounded-md text-zinc-800">
+                  <AlertTriangle className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-rose-950">
-                    {overdueCount} Book Loan(s) Overdue
+                  <h4 className="text-xs font-semibold text-zinc-900">
+                    {overdueCount} Overdue Loan(s)
                   </h4>
-                  <p className="text-[11px] text-rose-800">
-                    Committed return dates have passed. Click to view & send WhatsApp reminder.
+                  <p className="text-[11px] text-zinc-500">
+                    Return date has elapsed. Click to review or send WhatsApp notice.
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-rose-700">&rarr;</span>
+              <span className="text-xs text-zinc-400 font-medium">&rarr;</span>
             </div>
           )}
 
@@ -130,53 +125,53 @@ export const ShopkeeperDashboard: React.FC = () => {
                 setActiveSubTab('loans');
                 setCurrentFilter('due_today');
               }}
-              className="bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-orange-100/80 transition-all shadow-sm"
+              className="bg-white border border-zinc-200 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:border-zinc-300 transition-colors shadow-sm"
             >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-200/60 rounded-xl text-orange-800">
-                  <Clock className="w-5 h-5 text-orange-600" />
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-zinc-100 rounded-md text-zinc-800">
+                  <Clock className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-orange-950">
-                    {dueTodayCount} Book(s) Due for Return Today
+                  <h4 className="text-xs font-semibold text-zinc-900">
+                    {dueTodayCount} Book(s) Due Today
                   </h4>
-                  <p className="text-[11px] text-orange-800">
+                  <p className="text-[11px] text-zinc-500">
                     Expected at the counter drop-box today.
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-orange-700">&rarr;</span>
+              <span className="text-xs text-zinc-400 font-medium">&rarr;</span>
             </div>
           )}
         </div>
       )}
 
-      {/* Sub-Navigation Switcher */}
-      <div className="flex items-center gap-2 border-b border-sanctuary-200 pb-3 text-xs sm:text-sm font-semibold">
+      {/* Subtab Segmented Control */}
+      <div className="flex items-center gap-1 border-b border-zinc-200/80 pb-2 text-xs font-medium">
         <button
           onClick={() => setActiveSubTab('loans')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
             activeSubTab === 'loans'
-              ? 'bg-sanctuary-900 text-white shadow-warm'
-              : 'text-stone-600 hover:bg-sanctuary-100/60'
+              ? 'bg-zinc-900 text-white'
+              : 'text-zinc-600 hover:bg-zinc-100'
           }`}
         >
-          <LayoutDashboard className="w-4 h-4" />
-          <span>Loans Dashboard</span>
+          <LayoutDashboard className="w-3.5 h-3.5" />
+          <span>Loans</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('approvals')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
             activeSubTab === 'approvals'
-              ? 'bg-sanctuary-900 text-white shadow-warm'
-              : 'text-stone-600 hover:bg-sanctuary-100/60'
+              ? 'bg-zinc-900 text-white'
+              : 'text-zinc-600 hover:bg-zinc-100'
           }`}
         >
-          <Clock className="w-4 h-4" />
-          <span>Approval Queue</span>
+          <Clock className="w-3.5 h-3.5" />
+          <span>Approvals</span>
           {pendingCount > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[10px] font-black">
+            <span className="px-1.5 py-0.2 rounded-full bg-zinc-800 text-white text-[9px] font-mono">
               {pendingCount}
             </span>
           )}
@@ -184,27 +179,25 @@ export const ShopkeeperDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveSubTab('analytics')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
             activeSubTab === 'analytics'
-              ? 'bg-sanctuary-900 text-white shadow-warm'
-              : 'text-stone-600 hover:bg-sanctuary-100/60'
+              ? 'bg-zinc-900 text-white'
+              : 'text-zinc-600 hover:bg-zinc-100'
           }`}
         >
-          <BarChart3 className="w-4 h-4" />
-          <span>Monthly Analytics & Reports</span>
+          <BarChart3 className="w-3.5 h-3.5" />
+          <span>Analytics</span>
         </button>
       </div>
 
-      {/* Render Active View */}
+      {/* Subtab views */}
       {activeSubTab === 'loans' && (
-        <div className="space-y-6">
-          {/* Stats KPI Cards */}
+        <div className="space-y-4">
           <StatsCards
             currentFilter={currentFilter}
             onSelectFilter={(f) => setCurrentFilter(f)}
           />
 
-          {/* Table / Cards */}
           <LoanManagementTable
             loans={filteredLoans}
             currentFilter={currentFilter}
@@ -223,7 +216,6 @@ export const ShopkeeperDashboard: React.FC = () => {
         <AnalyticsView />
       )}
 
-      {/* Counter Standee Modal */}
       <CounterQRModal isOpen={showQRModal} onClose={() => setShowQRModal(false)} />
     </div>
   );

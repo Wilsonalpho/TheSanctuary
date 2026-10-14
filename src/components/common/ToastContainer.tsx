@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSanctuary } from '../../context/SanctuaryContext';
-import { X, Bell, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { X, Check, AlertCircle, Info } from 'lucide-react';
 
 export const ToastContainer: React.FC = () => {
   const { toasts, removeToast } = useSanctuary();
@@ -10,35 +10,29 @@ export const ToastContainer: React.FC = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 max-w-sm w-full pointer-events-none px-4 sm:px-0">
       {toasts.map((toast) => {
-        let bg = 'bg-white border-sanctuary-200 text-coffee-dark';
-        let icon = <Bell className="w-5 h-5 text-sanctuary-600" />;
+        let icon = <Info className="w-3.5 h-3.5 text-zinc-500" />;
 
         if (toast.type === 'success') {
-          bg = 'bg-emerald-50 border-emerald-200 text-emerald-950';
-          icon = <CheckCircle2 className="w-5 h-5 text-emerald-600" />;
-        } else if (toast.type === 'warning') {
-          bg = 'bg-amber-50 border-amber-300 text-amber-950';
-          icon = <AlertTriangle className="w-5 h-5 text-amber-600" />;
-        } else if (toast.type === 'danger') {
-          bg = 'bg-rose-50 border-rose-200 text-rose-950';
-          icon = <AlertCircle className="w-5 h-5 text-rose-600" />;
+          icon = <Check className="w-3.5 h-3.5 text-zinc-900" />;
+        } else if (toast.type === 'warning' || toast.type === 'danger') {
+          icon = <AlertCircle className="w-3.5 h-3.5 text-zinc-900" />;
         }
 
         return (
           <div
             key={toast.id}
-            className={`pointer-events-auto p-4 rounded-xl border shadow-warm-lg flex items-start gap-3 transition-all duration-300 transform translate-y-0 ${bg}`}
+            className="pointer-events-auto p-3 rounded-xl border border-zinc-200 bg-white/95 backdrop-blur-md shadow-lg flex items-start gap-2.5 transition-all duration-200"
           >
-            <div className="shrink-0 mt-0.5">{icon}</div>
+            <div className="shrink-0 mt-0.5 p-1 rounded-md bg-zinc-100 text-zinc-800">{icon}</div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-sm leading-tight">{toast.title}</h4>
-              <p className="text-xs mt-1 text-opacity-80 break-words leading-relaxed">{toast.message}</p>
+              <h4 className="font-semibold text-xs text-zinc-900 leading-tight">{toast.title}</h4>
+              <p className="text-[11px] text-zinc-500 mt-0.5 break-words leading-relaxed">{toast.message}</p>
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="shrink-0 p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-black/5"
+              className="shrink-0 p-1 rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3 h-3" />
             </button>
           </div>
         );

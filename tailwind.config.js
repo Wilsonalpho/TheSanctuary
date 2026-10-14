@@ -7,40 +7,47 @@ export default {
   theme: {
     extend: {
       colors: {
+        primary: {
+          DEFAULT: '#18181b', // zinc-900
+          hover: '#09090b',   // zinc-950
+          light: '#f4f4f5',   // zinc-100
+        },
         sanctuary: {
-          50: '#fbf8f5',
-          100: '#f5eee6',
-          200: '#ebd9c8',
-          300: '#debfa4',
-          400: '#c79870',
-          500: '#b47948',
-          600: '#9b5e35',
-          700: '#7e462a',
-          800: '#673926',
-          900: '#4e2a1e',
-          950: '#2d150e',
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
+          950: '#09090b',
         },
         coffee: {
-          dark: '#1c130e',
-          espresso: '#2a1a12',
-          roast: '#3b251a',
-          mocha: '#5c3a28',
-          latte: '#d8c2ad',
-          foam: '#fdfbf7',
+          dark: '#18181b',
+          espresso: '#27272a',
+          roast: '#3f3f46',
+          mocha: '#52525b',
+          latte: '#e4e4e7',
+          foam: '#fafafa',
         },
         paper: {
-          DEFAULT: '#fbf9f4',
-          dark: '#f3efe6',
-          aged: '#eae3d2'
+          DEFAULT: '#ffffff',
+          dark: '#fafafa',
+          aged: '#f4f4f5'
         }
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Inter"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['"Inter"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'], // Redirect serif to neat Inter
       },
       boxShadow: {
-        'warm': '0 4px 20px -2px rgba(92, 58, 40, 0.08), 0 2px 6px -1px rgba(92, 58, 40, 0.04)',
-        'warm-lg': '0 10px 25px -3px rgba(92, 58, 40, 0.12), 0 4px 10px -2px rgba(92, 58, 40, 0.06)',
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
+        'warm': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
+        'warm-lg': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
       }
     },
   },
