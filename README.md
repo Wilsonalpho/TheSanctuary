@@ -1,6 +1,11 @@
 # ☕ The Sanctuary — Coffee Shop Book Lending System
 
-A mobile-responsive web application designed for coffee shops to manage book lending seamlessly through QR code scanning, instant staff approval workflows, real-time push notifications, and analytics dashboards.
+[![Live Demo](https://img.shields.io/badge/Live%20Deployment-Netlify-00C7B7?style=flat&logo=netlify&logoColor=white)](https://libsancutary.netlify.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/Wilsonalpho/TheSanctuary)
+
+> **Public Web Application URL**: **[https://libsancutary.netlify.app](https://libsancutary.netlify.app)**
+
+A mobile-responsive web application designed for coffee shops to manage book lending seamlessly through QR code scanning, instant staff approval workflows, real-time alerts, book database catalog management, and analytics dashboards.
 
 ---
 
