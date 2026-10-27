@@ -115,17 +115,22 @@ export const SanctuaryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     let eventSource: EventSource | null = null;
     let reconnectTimeout: ReturnType<typeof setTimeout>;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 3;
 
     const connectSSE = () => {
-      eventSource = new EventSource('/api/events');
+      try {
+        eventSource = new EventSource('/api/events');
 
-      eventSource.onopen = () => {
-        setSseConnected(true);
-      };
+        eventSource.onopen = () => {
+          setSseConnected(true);
+          reconnectAttempts = 0;
+        };
 
-      eventSource.addEventListener('connected', () => {
-        setSseConnected(true);
-      });
+        eventSource.addEventListener('connected', () => {
+          setSseConnected(true);
+          reconnectAttempts = 0;
+        });
 
       // New borrow request received from customer
       eventSource.addEventListener('new_request', (event: MessageEvent) => {
@@ -246,9 +251,15 @@ export const SanctuaryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (eventSource) {
           eventSource.close();
         }
-        reconnectTimeout = setTimeout(connectSSE, 5000);
+        reconnectAttempts++;
+        if (reconnectAttempts < maxReconnectAttempts) {
+          reconnectTimeout = setTimeout(connectSSE, 5000);
+        }
       };
-    };
+    } catch {
+      setSseConnected(false);
+    }
+  };
 
     connectSSE();
 

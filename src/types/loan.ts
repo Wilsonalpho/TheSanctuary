@@ -17,6 +17,7 @@ export interface Loan {
   returnNotes?: string;
   rejectionReason?: string;
   shopkeeperNote?: string;
+  extensionNotes?: string;
   approvedAt?: string;
   createdAt: string;
   // Augmented properties

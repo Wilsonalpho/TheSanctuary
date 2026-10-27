@@ -134,7 +134,8 @@ export const LendingForm: React.FC<LendingFormProps> = ({ onSuccess }) => {
 
       if (photoFile) {
         formData.append('photo', photoFile);
-      } else if (photoBase64) {
+      }
+      if (photoBase64) {
         formData.append('photoBase64', photoBase64);
       }
 

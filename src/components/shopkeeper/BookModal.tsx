@@ -119,7 +119,8 @@ export const BookModal: React.FC<BookModalProps> = ({ isOpen, onClose, bookToEdi
 
       if (imageFile) {
         formData.append('image', imageFile);
-      } else if (imageBase64) {
+      }
+      if (imageBase64) {
         formData.append('imageBase64', imageBase64);
       } else if (imageUrl) {
         formData.append('image', imageUrl);
